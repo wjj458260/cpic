@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+<meta name="x5-orientation" content="portrait">
+<title>核损施救费计算</title>
+<style>
+*{box-sizing:border-box;字体系列:"微软雅黑","苹方",Arial,无衬线字体}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding:12px;background:#f5f7fa;字体大小:15px;颜色:#333;-webkit-tap-highlight-color:透明}
+.主{最大宽度:520px;边距:0 自动;背景:#fff;边框半径:12px;内边距:18px 16px 20px;盒子阴影:0 2px 10px #00000012}
+.标题{文本对齐:居中;字体大小:19px;字体粗细:加粗;下边距:18px;颜色:#222}
+.项{下边距:16px}
+标签{显示:块级元素;底部外边距:6像素;字体大小:14像素;颜色:#444;字体粗细:600}
+选择,.文本{宽度:100%;高度:46像素;内边距:0 12像素;边框:1像素 实线#ddd;边框半径:8像素;字体大小:16像素;背景:#fff;颜色:#222}
+.txt{-webkit-appearance:none;外观:none;-webkit-user-select:文本;用户选择:文本;触摸操作:操控}
+选择:焦点,.文本:焦点{轮廓:无;边框颜色:#007aff}
+#calcBtn{宽度:100%;高度:50px;背景颜色:#007aff;颜色:#fff;边框:无;圆角半径:8px;字体大小:17px;上边距:6px;-webkit-外观:无;外观:无;触摸操作:操控}
+#calcBtn:active{background:#0062cc}
+input.pick{background:#fff;cursor:pointer;-webkit-user-select:none;user-select:none}
+.pad-mask{display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:#00000055;z-index:99}
+.填充{位置:绝对;左:0;右:0;下:0;背景:#f7f7f7;边框半径:14px 14px 0 0;内边距:8px 10px 12px;盒子阴影:0 -2px 14px #00000022}
+.pad-head{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 6px}
+.pad-title{font-size:14px;color:#666}
+.pad-close{font-size:14px;color:#007aff;padding:6px 4px}
+.pad-val{text-align:right;font-size:26px;font-weight:bold;color:#222;padding:4px 10px 10px;border-bottom:1px solid #e2e2e2;min-height:42px}
+#padUnit{font-size:14px;color:#888;font-weight:normal;margin-left:5px}
+.pad-keys,.pad-foot{display:flex;flex-wrap:wrap;margin:0 -4px}
+.pad-foot{margin-top:2px}
+.pk{flex:0 0 33.3333%;max-width:33.3333%;padding:4px}
+.pad-foot .pk{flex:0 0 50%;max-width:50%}
+.pk button{width:100%;height:48px;margin:0;padding:0;border:none;border-radius:8px;background:#fff;color:#222;font-size:22px;box-shadow:0 1px 0 #dcdcdc;-webkit-appearance:none;appearance:none;touch-action:manipulation}
+.pk button:active{background:#e6f0ff}
+.pad-foot .pk button{font-size:17px}
+#padClear{background:#f0f0f0;color:#444}
+#padOk{background:#007aff;color:#fff}
+.road-row{display:flex;align-items:center;padding:10px 12px;border:1px solid #e5e5e5;border-radius:8px;margin-bottom:8px;background:#fafafa}
+.road-row.on{border-color:#007aff;background:#f0f9ff}
+.road-cb{width:20px;height:20px;flex:0 0 20px;margin:0 10px 0 0}
+.road-name{flex:1 1 auto;font-size:14px;line-height:1.35;color:#333;padding-right:8px}
+.road-km{width:84px;flex:0 0 84px;height:38px;text-align:center;padding:0 6px;font-size:16px}
+.道路-公里:禁用{背景:#f0f0f0;颜色:#bbb;边框颜色:#e8e8e8}
+.hint{font-size:12px;color:#999;line-height:1.6;margin-top:4px}
+.two{display:flex;align-items:center}
+.two span{flex:0 0 52px;font-size:14px;color:#444}
+.two .txt{flex:1 1 auto;text-align:center}
+.two em{flex:0 0 30px;text-align:right;font-style:normal;font-size:13px;color:#888}
+.err{display:none;margin-top:12px;padding:10px 12px;background:#fff1f0;border:1px solid #ffccc7;color:#d4380d;border-radius:8px;font-size:14px;line-height:1.6}
+.result{display:none;margin-top:16px;padding:14px;background:#f0f9ff;border-radius:10px;font-size:14px;line-height:1.8;color:#333}
+.result .ln{margin-bottom:1px}
+.result .sub{padding-left:10px;color:#555}
+.result .hd{font-weight:bold;color:#222;margin-top:8px}
+.total{font-size:18px;font-weight:bold;color:#ff3b30;margin-top:10px;padding-top:10px;border-top:1px dashed #cfe6f7}
+.警告{颜色:红色;字体粗细:加粗;上边距:10px;动画:闪烁 1s 无限 交替}
+@keyframes flash{from{opacity:1}to{opacity:.4}}
+</style>
+</head>
+<body>
+<div class="main">
+  <div class="title">核损施救费计算</div>
+  <div class="item">
+    <label>选择机构（地区）</label>
+    <选择 id="area"></选择>
+  </div>
+  <div class="item">
+    <label>选择施救车辆（具体车型）</label>
+    <选择 id="汽车"></选择>
+  </div>
+  <div class="item">
+    <label>选择道路类型（可多选，跨路段分别填公里数）</label>
+    <分隔符 id="roadBox"></分隔符>
+    <分隔符 class="hint">勾选本次施救实际经过的道路，点公里数框用页面数字键盘输入该段公里数；不经过的不用勾。</div>
+  </div>
+  <div class="item">
+    <label>施救方式（拖车 / 吊车）及台数</label>
+    <div class="two" style="margin-bottom:8px">
+      <span>拖车</span>
+      <input type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" class="txt" id="tow" placeholder="点击输入">
+      <em>台</em>
+    </div>
+    <分隔符 类="二">
+      <span>吊车</span>
+      <input type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" class="txt" id="crane" placeholder="点击输入">
+      <em>台</em>
+    </div>
+    <div class="hint">台数仅作案件登记，不参与施救费计算；不需要的留空即可。</div>
+  </div>
+  <div id="err" class="err"></div>
+  <button type="button" id="calcBtn">立即计算施救费</button>
+  <div id="result" class="result"></div>
+</div>
+<div id="padMask" class="pad-mask">
+  <div class="pad">
+    <div class="pad-head">
+      <span class="pad-title" id="padTitle">输入数值</span>
+      <span class="pad-close" id="padClose">关闭</span>
+    </div>
+    <div class="pad-val"><span id="padNum">0</span><span id="padUnit">公里</span></div>
+    <div class="pad-keys" id="padKeys">
+      <div class="pk"><button type="button" data-k="1">1</button></div>
+      <div class="pk"><button type="button" data-k="2">2</button></div>
+      <div class="pk"><button type="button" data-k="3">3</button></div>
+      <div class="pk"><button type="button" data-k="4">4</button></div>
+      <div class="pk"><button type="button" data-k="5">5</button></div>
+      <div class="pk"><button type="button" data-k="6">6</button></div>
+      <div class="pk"><button type="button" data-k="7">7</button></div>
+      <div class="pk"><button type="button" data-k="8">8</button></div>
+      <div class="pk"><button type="button" data-k="9">9</button></div>
+      <div class="pk"><button type="button" data-k=".">.</button></div>
+      <div class="pk"><button type="button" data-k="0">0</button></div>
+      <div class="pk"><button type="button" data-k="del">&#9003;</button></div>
+    </div>
+    <div class="pad-foot">
+      <div class="pk"><button type="button" id="padClear">清空</button></div>
+      <div class="pk"><button type="button" id="padOk">确定</button></div>
+    </div>
+  </div>
+</div>
+<script>
+const data = {
+"襄阳":{
+"2.5吨以下货车，19座以下客车":{"高速公路":{s:300,k:10,p:15},"普通公路（城区）":{s:180,k:10,p:8},"普通公路（乡镇、山区）":{s:180,k:10,p:10}},
+"2.5-7吨货车，20-40座客车":{"高速公路":{s:400,k:10,p:20},"普通公路（城区）":{s:450,k:10,p:10},"普通公路（乡镇、山区）":{s:450,k:10,p:10}},
+"7-15吨货车，40座以上客车"
